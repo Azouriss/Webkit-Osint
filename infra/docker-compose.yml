@@ -1,0 +1,21 @@
+# infra/docker-compose.yml
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: osint
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes: ["db-data:/var/lib/postgresql/data"]
+  backend:
+    build: ../backend
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/osint
+    depends_on: [db]
+    ports: ["8005:8005"]
+  dashboard:
+    build: ../dashboard
+    depends_on: [backend]
+    ports: ["3005:80"]
+volumes:
+  db-data:
